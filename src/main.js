@@ -11,4 +11,4 @@ app.use(createPinia())
 app.use(router)
 
 // 挂载应用
-app.mount('#app')
+app.mount('#app') 

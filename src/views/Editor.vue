@@ -4,16 +4,15 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script>
 import GrapesEditor from '../components/GrapesEditor.vue';
 
-export default defineComponent({
+export default {
   name: 'EditorPage',
   components: {
     GrapesEditor
   }
-});
+}
 </script>
 
 <style scoped>

@@ -22,7 +22,7 @@
         </button>
       </div>
     </div>
-    
+
     <div class="editor-main">
       <!-- 左侧面板 -->
       <div class="left-panel">
@@ -33,26 +33,26 @@
           <div id="blocks" class="panel-content"></div>
         </div>
       </div>
-      
+
       <!-- 中间画布 -->
       <div class="canvas-container">
         <div id="gjs"></div>
       </div>
-      
+
       <!-- 右侧面板 -->
       <div class="right-panel">
         <div class="panel-tabs">
-          <button class="tab-btn" :class="{active: activeTab === 'layers'}" @click="switchTab('layers')">
+          <button class="tab-btn" :class="{ active: activeTab === 'layers' }" @click="switchTab('layers')">
             <i class="fa fa-layer-group"></i> 层级
           </button>
-          <button class="tab-btn" :class="{active: activeTab === 'styles'}" @click="switchTab('styles')">
+          <button class="tab-btn" :class="{ active: activeTab === 'styles' }" @click="switchTab('styles')">
             <i class="fa fa-paint-brush"></i> 样式
           </button>
-          <button class="tab-btn" :class="{active: activeTab === 'traits'}" @click="switchTab('traits')">
+          <button class="tab-btn" :class="{ active: activeTab === 'traits' }" @click="switchTab('traits')">
             <i class="fa fa-sliders"></i> 属性
           </button>
         </div>
-        
+
         <div class="panel-content">
           <div id="layers-manager" v-show="activeTab === 'layers'"></div>
           <div id="styles-manager" v-show="activeTab === 'styles'"></div>
@@ -60,7 +60,7 @@
         </div>
       </div>
     </div>
-    
+
     <!-- HTML 导入弹窗 -->
     <div v-if="showImportDialog" class="dialog">
       <div class="dialog-content">
@@ -75,13 +75,13 @@
         </div>
       </div>
     </div>
-    
+
     <!-- 预览弹窗 -->
     <div v-if="showPreviewDialog" class="dialog">
       <div class="dialog-content preview-content">
         <div class="dialog-header">
           <h3>{{ previewType === 'html' ? 'HTML 预览' : 'JSON 预览' }}</h3>
-          
+
           <!-- HTML 预览时添加代码/预览切换按钮 -->
           <div v-if="previewType === 'html'" class="preview-mode-switch">
             <button :class="{ active: previewMode === 'visual' }" @click="previewMode = 'visual'">
@@ -91,26 +91,26 @@
               <i class="fa fa-code"></i> 代码
             </button>
           </div>
-          
+
           <button class="close-btn" @click="closePreview"><i class="fa fa-times"></i></button>
         </div>
-        
+
         <!-- HTML 预览 -->
         <div v-if="previewType === 'html'" class="preview-container">
           <!-- 可视化预览 -->
           <div v-show="previewMode === 'visual'" class="preview-frame-container">
             <iframe ref="previewFrame" class="preview-frame"></iframe>
           </div>
-          
+
           <!-- 代码预览 -->
           <pre v-show="previewMode === 'code'" class="preview-code"><code>{{ previewContent }}</code></pre>
         </div>
-        
+
         <!-- JSON 预览 -->
         <div v-else class="preview-json-container">
           <pre class="preview-json" v-html="previewContent"></pre>
         </div>
-        
+
         <div class="dialog-buttons">
           <button @click="exportPreview" class="primary-btn"><i class="fa fa-download"></i> 导出</button>
           <button @click="closePreview">关闭</button>
@@ -120,33 +120,32 @@
   </div>
 </template>
 
-<script lang="ts">
+<script>
 import { defineComponent, onMounted, onBeforeUnmount, ref } from 'vue';
 import grapesjs from 'grapesjs';
-import type { Editor } from 'grapesjs';
-import { 
-  htmlToGrapesJson, 
-  loadGrapesJson, 
-  registerAtomicBlocks, 
-  registerBusinessBlocks, 
+import {
+  htmlToGrapesJson,
+  loadGrapesJson,
+  registerAtomicBlocks,
+  registerBusinessBlocks,
   setupComponentConstraints,
   createImportedComponent
-} from '../utils/grapesjs-utils';
+} from '../utils/grapesjs-utils.js';
 
 export default defineComponent({
   name: 'GrapesEditor',
   setup() {
-    const editor = ref<Editor | null>(null);
+    const editor = ref(null);
     const currentDevice = ref('桌面端');
     const showImportDialog = ref(false);
     const importHtmlText = ref('');
     const showPreviewDialog = ref(false);
-    const previewType = ref<'html' | 'json'>('html');
+    const previewType = ref('html');
     const previewContent = ref('');
-    const previewFrame = ref<HTMLIFrameElement | null>(null);
+    const previewFrame = ref(null);
     const activeTab = ref('layers');
-    const previewMode = ref<'visual' | 'code'>('visual');
-    
+    const previewMode = ref('visual');
+
     onMounted(() => {
       // 初始化 GrapesJS 编辑器
       editor.value = grapesjs.init({
@@ -538,10 +537,12 @@ export default defineComponent({
                     { type: 'number', units: ['px'], property: 'blur', defaults: '0' },
                     { type: 'number', units: ['px'], property: 'spread', defaults: '0' },
                     { type: 'color', property: 'shadow-color', defaults: '#000000' },
-                    { type: 'select', property: 'shadow-type', defaults: '', options: [
-                      { value: '', name: '外部阴影' },
-                      { value: 'inset', name: '内部阴影' },
-                    ]},
+                    {
+                      type: 'select', property: 'shadow-type', defaults: '', options: [
+                        { value: '', name: '外部阴影' },
+                        { value: 'inset', name: '内部阴影' },
+                      ]
+                    },
                   ],
                 },
                 {
@@ -605,202 +606,78 @@ export default defineComponent({
         // 修改面板配置
         panels: { defaults: [] },
       });
-      
+
       // 在编辑器初始化完成后，添加必要的事件监听和设置
       if (editor.value) {
         // 1. 监听组件选择、添加、变更等核心事件
         // 这些事件对应不同用户操作，需要确保UI面板正确更新
 
         // 组件被选择时
-        editor.value.on('component:selected', (component: any) => {
+        editor.value.on('component:selected', (component) => {
           console.log('组件被选择:', component);
-          
+
           // 重要：切换到样式面板，这样用户可以立即编辑样式
           activeTab.value = 'styles';
-          
-          // 延迟执行以确保DOM已更新
-          setTimeout(() => {
-            // 强制重渲染所有管理器
-            forceRenderPanels();
-          }, 50);
         });
-        
+
         // 组件被添加时（通过拖拽或其他方式）
         editor.value.on('component:add', () => {
           console.log('组件被添加');
-          setTimeout(() => forceRenderPanels(), 50);
         });
-        
+
         // 组件更新时
         editor.value.on('component:update', () => {
           console.log('组件更新');
-          setTimeout(() => forceRenderPanels(), 50);
         });
-        
+
         // 特别监听block拖拽结束事件
         editor.value.on('block:drag:stop', () => {
           console.log('拖拽组件完成');
           // 强制进行组件选择
-          const lastSelected = (editor.value as any)?.getSelected();
+          const lastSelected = editor.value.getSelected();
           if (lastSelected) {
             // 重选当前组件以触发面板更新
-            (editor.value as any).select(lastSelected);
+            editor.value.select(lastSelected);
           }
-          
-          setTimeout(() => forceRenderPanels(), 100);
         });
-        
+
         // 设备切换时
         editor.value.on('device:update', () => {
           console.log('设备切换');
-          const device = (editor.value as any).getDevice();
+          const device = editor.value.getDevice();
           currentDevice.value = device ? device.name : '桌面端';
-          
-          // 更新后强制重渲染面板和画布
-          setTimeout(() => {
-            forceRenderPanels();
-            // 触发额外的重绘事件
-            editor.value?.trigger('change:device');
-            // 使用Canvas API刷新画布
-            (editor.value as any).Canvas?.refresh();
-          }, 100);
         });
 
         // 注册原子组件 Block
         registerAtomicBlocks(editor.value);
-        
+
         // 注册业务组件 Block
         registerBusinessBlocks(editor.value);
-        
+
         // 设置组件约束
         setupComponentConstraints(editor.value);
-        
+
         // 添加设备切换命令
         editor.value.Commands.add('set-device-desktop', {
-          run: (editor: any) => editor.setDevice('桌面端'),
+          run: (editor) => editor.setDevice('桌面端'),
         });
         editor.value.Commands.add('set-device-tablet', {
-          run: (editor: any) => editor.setDevice('平板端'),
+          run: (editor) => editor.setDevice('平板端'),
         });
         editor.value.Commands.add('set-device-mobile', {
-          run: (editor: any) => editor.setDevice('移动端'),
+          run: (editor) => editor.setDevice('移动端'),
         });
-        
-        // 初始强制渲染所有管理器
-        forceRenderPanels();
-        
-        // 添加全局点击监听，确保在组件外点击时更新UI
-        const canvas = (editor.value as any).Canvas.getElement();
-        if (canvas) {
-          canvas.addEventListener('click', () => {
-            setTimeout(() => forceRenderPanels(), 50);
-          });
-        }
+
       }
     });
-    
-    // 辅助函数：强制重新渲染所有管理器面板
-    const forceRenderPanels = () => {
-      if (!editor.value) return;
-      
-      try {
-        // 1. 样式管理器
-        if ((editor.value as any).StyleManager) {
-          (editor.value as any).StyleManager.render();
-        }
-        
-        // 2. 特性管理器
-        if ((editor.value as any).TraitManager) {
-          (editor.value as any).TraitManager.render();
-        }
-        
-        // 3. 层级管理器
-        if ((editor.value as any).LayerManager) {
-          (editor.value as any).LayerManager.render();
-        }
-        
-        // 4. 触发额外的更新事件
-        editor.value.trigger('change:selectedComponent');
-        editor.value.trigger('update');
-        
-        // 5. 确保画布正确刷新
-        (editor.value as any).Canvas?.refresh();
-      } catch (error) {
-        console.error('重渲染面板时出错:', error);
-      }
-    };
-    
-    // 设备切换 - 完全重写
-    const setDevice = (device: string) => {
-      if (!editor.value) return;
-      
-      console.log('切换设备到:', device);
-      
-      try {
-        // 1. 确保使用正确的API
-        (editor.value as any).setDevice(device);
-        
-        // 2. 手动更新设备状态
-        currentDevice.value = device;
-        
-        // 3. 强制触发必要的更新事件 - 使用延迟确保UI更新
-        setTimeout(() => {
-          // 触发设备更新事件
-          editor.value?.trigger('device:update');
-          
-          // 刷新画布和UI
-          (editor.value as any).Canvas?.refresh();
-          forceRenderPanels();
-          
-          // 触发额外的变更事件
-          editor.value?.trigger('change');
-          editor.value?.trigger('change:device');
-        }, 100);
-      } catch (error) {
-        console.error('设备切换失败:', error);
-      }
-    };
-    
-    // 面板切换 - 重写以确保面板内容正确刷新
-    const switchTab = (tab: string) => {
-      // 1. 更新当前活动选项卡
-      activeTab.value = tab;
-      
-      // 2. 延迟执行以确保DOM更新后再刷新面板
-      setTimeout(() => {
-        if (!editor.value) return;
-        
-        // 3. 根据不同的选项卡，强制渲染相应的面板
-        try {
-          if (tab === 'styles' && (editor.value as any).StyleManager) {
-            (editor.value as any).StyleManager.render();
-          } else if (tab === 'traits' && (editor.value as any).TraitManager) {
-            (editor.value as any).TraitManager.render();
-          } else if (tab === 'layers' && (editor.value as any).LayerManager) {
-            (editor.value as any).LayerManager.render();
-          }
-          
-          // 4. 强制选择当前组件，确保面板内容正确
-          const selected = (editor.value as any).getSelected();
-          if (selected) {
-            // 重新选择以触发UI更新
-            (editor.value as any).select(selected);
-          }
-          
-          // 5. 触发通用更新事件
-          editor.value.trigger('change:selectedComponent');
-          editor.value.trigger('update');
-        } catch (error) {
-          console.error('切换面板时出错:', error);
-        }
-      }, 50);
-    };
-    
+
+
+
     // 导入 HTML
     const importHtml = () => {
       showImportDialog.value = true;
     };
-    
+
     // 确认导入
     const confirmImport = () => {
       if (!editor.value || !importHtmlText.value) {
@@ -808,173 +685,42 @@ export default defineComponent({
         importHtmlText.value = '';
         return;
       }
-      
+
       // 隐藏导入对话框
       showImportDialog.value = false;
-      
-      // 显示加载提示
-      const loadingToast = document.createElement('div');
-      loadingToast.style.position = 'fixed';
-      loadingToast.style.top = '50%';
-      loadingToast.style.left = '50%';
-      loadingToast.style.transform = 'translate(-50%, -50%)';
-      loadingToast.style.padding = '15px 25px';
-      loadingToast.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
-      loadingToast.style.color = 'white';
-      loadingToast.style.borderRadius = '6px';
-      loadingToast.style.zIndex = '10000';
-      loadingToast.textContent = '正在处理HTML...';
-      document.body.appendChild(loadingToast);
-      
-      try {
-        // 添加一个临时加载提示到编辑器中
-        if (editor.value) {
-          editor.value.DomComponents.clear();
-          editor.value.DomComponents.addComponent({
-            tagName: 'div',
-            attributes: { style: 'padding: 20px; text-align: center;' },
-            content: '正在处理导入内容...'
-          });
-        }
-        
-        // 使用setTimeout延迟执行，避免界面卡死
-        setTimeout(() => {
-          try {
-            // 限制HTML大小
-            const maxLength = 10000; // 限制为1万字符
-            let html = importHtmlText.value.trim();
-            
-            if (html.length > maxLength) {
-              html = html.slice(0, maxLength);
-              alert('HTML内容过大，已被截断');
-            }
-            
-            // 清除已有内容
-            editor.value!.DomComponents.clear();
-            
-            // 将导入的HTML转换为业务组件
-            try {
-              // 使用新的方法创建业务组件
-              const businessComponent = createImportedComponent(editor.value!, html);
-              
-              // 选中该组件以便编辑
-              setTimeout(() => {
-                // 确保组件被正确选中
-                if (businessComponent) {
-                  try {
-                    // 强制清空选择，然后重新选择，避免选择状态问题
-                    (editor.value as any).select(null);
-                    setTimeout(() => {
-                      // 重新选择业务组件
-                      (editor.value as any).select(businessComponent);
-                      
-                      // 强制更新所有面板
-                      forceRenderPanels();
-                      
-                      // 触发样式面板更新的特定事件
-                      editor.value!.trigger('styleManager:update');
-                      editor.value!.trigger('selector:component:update');
-                      
-                      // 默认打开样式面板
-                      activeTab.value = 'styles';
-                      switchTab('styles');
-                      
-                      // 移除加载提示
-                      document.body.removeChild(loadingToast);
-                      
-                      // 提示用户组件已创建
-                      setTimeout(() => {
-                        const successToast = document.createElement('div');
-                        successToast.style.position = 'fixed';
-                        successToast.style.bottom = '20px';
-                        successToast.style.right = '20px';
-                        successToast.style.padding = '15px 25px';
-                        successToast.style.backgroundColor = 'rgba(40, 167, 69, 0.9)';
-                        successToast.style.color = 'white';
-                        successToast.style.borderRadius = '6px';
-                        successToast.style.zIndex = '10000';
-                        successToast.textContent = '业务组件创建成功！';
-                        document.body.appendChild(successToast);
-                        
-                        setTimeout(() => {
-                          document.body.removeChild(successToast);
-                        }, 3000);
-                      }, 500);
-                    }, 100);
-                  } catch (e) {
-                    console.error('选择业务组件时出错:', e);
-                    document.body.removeChild(loadingToast);
-                  }
-                } else {
-                  console.error('业务组件创建失败或返回空值');
-                  document.body.removeChild(loadingToast);
-                }
-              }, 200);
-              
-            } catch (componentError) {
-              console.error('创建业务组件失败:', componentError);
-              
-              // 回退到直接添加内容
-              editor.value!.DomComponents.clear();
-              editor.value!.DomComponents.addComponent({
-                content: html
-              });
-              
-              loadingToast.textContent = '作为普通内容导入成功';
-              setTimeout(() => {
-                document.body.removeChild(loadingToast);
-              }, 1500);
-            }
-            
-            // 清空导入文本
-            importHtmlText.value = '';
-          } catch (error) {
-            console.error('导入HTML失败:', error);
-            
-            // 添加错误提示到编辑器
-            editor.value!.DomComponents.clear();
-            editor.value!.DomComponents.addComponent({
-              tagName: 'div',
-              attributes: { 
-                style: 'padding: 20px; text-align: center; color: #d43f3a; border: 1px solid #d43f3a; border-radius: 5px; margin: 20px;' 
-              },
-              content: '<p>导入HTML失败</p><p style="font-size:12px;color:#666;">请尝试使用更简单的HTML内容</p>'
-            });
-            
-            loadingToast.textContent = '导入失败';
-            setTimeout(() => {
-              document.body.removeChild(loadingToast);
-              alert('导入HTML失败，请尝试使用更简单的HTML内容');
-            }, 1500);
-          }
-        }, 10);
-        
-      } catch (error) {
-        console.error('初始化导入过程出错:', error);
-        document.body.removeChild(loadingToast);
-        showImportDialog.value = false;
-        importHtmlText.value = '';
-        alert('导入HTML失败，请尝试使用更简单的HTML内容');
+      let html = importHtmlText.value.trim();
+     // 清除已有内容
+     editor.value.DomComponents.clear();
+      // 解析 HTML 内容并加载到编辑器中
+      const json = htmlToGrapesJson(editor.value,html);
+      if (json) {
+        loadGrapesJson(editor.value, json);
+      } else {
+        console.error('无法解析 HTML 内容');
       }
+
+      // 清空输入框
+      importHtmlText.value = '';
+
     };
-    
+
     // 取消导入
     const cancelImport = () => {
       showImportDialog.value = false;
       importHtmlText.value = '';
     };
-    
+
     // 预览 HTML
     const previewHtml = () => {
       if (editor.value) {
         previewType.value = 'html';
         showPreviewDialog.value = true;
         previewMode.value = 'visual'; // 默认显示可视化预览
-        
+
         // 获取 HTML 和 CSS
         const html = editor.value.getHtml();
         const css = editor.value.getCss();
-        
+
         const content = `<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -992,15 +738,15 @@ export default defineComponent({
   ${html}
 </body>
 </html>`;
-        
+
         previewContent.value = content;
-        
+
         // 确保 iframe 立即加载预览内容
         setTimeout(() => {
           if (previewFrame.value) {
-            const iframeDoc = previewFrame.value.contentDocument || 
-                             (previewFrame.value.contentWindow && previewFrame.value.contentWindow.document);
-            
+            const iframeDoc = previewFrame.value.contentDocument ||
+              (previewFrame.value.contentWindow && previewFrame.value.contentWindow.document);
+
             if (iframeDoc) {
               iframeDoc.open();
               iframeDoc.write(content);
@@ -1010,16 +756,16 @@ export default defineComponent({
         }, 100);
       }
     };
-    
+
     // 导出 JSON
     const exportJson = () => {
       if (editor.value) {
         previewType.value = 'json';
         showPreviewDialog.value = true;
-        
+
         const json = editor.value.getComponents();
         const jsonString = JSON.stringify(json, null, 4); // 使用4个空格缩进
-        
+
         // 添加改进的语法高亮
         const highlighted = jsonString
           .replace(/"([^"]+)":/g, '<span class="json-key">"$1"</span>:') // 键名
@@ -1027,17 +773,17 @@ export default defineComponent({
           .replace(/: ([0-9]+)/g, ': <span class="json-number">$1</span>') // 数字
           .replace(/: (true|false)/g, ': <span class="json-boolean">$1</span>') // 布尔值
           .replace(/: null/g, ': <span class="json-null">null</span>'); // null
-        
+
         previewContent.value = highlighted;
       }
     };
-    
+
     // 导出预览内容
     const exportPreview = () => {
       const element = document.createElement('a');
       const fileType = previewType.value === 'html' ? 'text/html' : 'application/json';
       const fileName = previewType.value === 'html' ? 'export.html' : 'export.json';
-      
+
       const blob = new Blob([previewContent.value], { type: fileType });
       element.href = URL.createObjectURL(blob);
       element.download = fileName;
@@ -1045,102 +791,36 @@ export default defineComponent({
       element.click();
       document.body.removeChild(element);
     };
-    
+
     // 修改清空画布功能
     const clearCanvas = () => {
-      if (confirm('确定要清空画布吗？此操作不可撤销。')) {
-        // 尝试重新初始化编辑器而不是清空内容
-        if (editor.value) {
-          try {
-            // 销毁现有编辑器
-            const editorContainer = document.getElementById('gjs');
-            editor.value.destroy();
-            
-            // 清空容器内容
-            if (editorContainer) {
-              editorContainer.innerHTML = '';
-            }
-            
-            // 重新初始化编辑器
-            // 注意：这里需要重复之前的初始化代码
-            editor.value = grapesjs.init({
-              container: '#gjs',
-              height: '100%',
-              width: '100%',
-              // 避免加载默认CSS
-              protectedCss: '',
-              // 不从元素加载组件
-              fromElement: false,
-              // 允许HTML内容编辑
-              allowScripts: 1,
-              // 禁用自动渲染，我们手动控制渲染
-              autorender: true,
-              // 存储管理器配置
-              storageManager: {
-                type: 'local',
-                autosave: false,
-                autoload: false,
-                id: 'gjs-',
-              },
-              // 其他必要的初始化参数...
-              blockManager: {
-                appendTo: '#blocks',
-                blocks: [],
-              },
-              components: `
-                <div style="
-                  padding: 30px; 
-                  text-align: center; 
-                  color: #333; 
-                  background-color: #f8f9fa; 
-                  border: 2px dashed #ccc; 
-                  border-radius: 8px; 
-                  margin: 20px;
-                  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                ">
-                  <h2 style="color: #444; margin-bottom: 15px;">拖拽左侧组件至此区域</h2>
-                  <p style="color: #666;">从左侧面板中选择组件，拖放到这里开始构建页面</p>
-                </div>
-              `,
-            });
-            
-            // 重新注册组件
-            if (editor.value) {
-              registerAtomicBlocks(editor.value);
-              registerBusinessBlocks(editor.value);
-              setupComponentConstraints(editor.value);
-            }
-            
-            alert('画布已清空');
-          } catch (error) {
-            console.error('清空画布时发生错误:', error);
-            alert('清空画布时出现问题，请刷新页面后重试。');
-          }
-        }
-      }
+
+      // 方法2：重置画布内容（更彻底）
+      editor.value.setComponents(''); // 设为空内容
+
+      // 可选：同时清空撤销历史
+      editor.value.UndoManager.clear();
     };
-    
+
     // 增加撤销功能
     const undoAction = () => {
       if (editor.value) {
-        // 使用any类型来避免TypeScript错误
-        (editor.value.Commands as any).run('core:undo');
+        editor.value.Commands.run('core:undo');
       }
     };
-    
+
     // 增加恢复功能
     const redoAction = () => {
       if (editor.value) {
-        // 使用any类型来避免TypeScript错误
-        (editor.value.Commands as any).run('core:redo');
+        editor.value.Commands.run('core:redo');
       }
     };
-    
+
     // 恢复关闭预览功能（被误删除了）
     const closePreview = () => {
       showPreviewDialog.value = false;
     };
-    
+
     // 组件销毁前清理资源
     onBeforeUnmount(() => {
       if (editor.value) {
@@ -1148,7 +828,7 @@ export default defineComponent({
         editor.value = null;
       }
     });
-    
+
     return {
       currentDevice,
       showImportDialog,
@@ -1166,9 +846,7 @@ export default defineComponent({
       exportJson,
       closePreview,
       exportPreview,
-      setDevice,
       clearCanvas,
-      switchTab,
       undoAction,
       redoAction,
     };
@@ -1181,7 +859,9 @@ export default defineComponent({
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css');
 
 /* 全局样式 */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
@@ -1222,7 +902,7 @@ body {
   font-size: 1.25rem;
   font-weight: bold;
   margin-right: 30px;
-  text-shadow: 0px 0px 1px rgba(255,255,255,0.5);
+  text-shadow: 0px 0px 1px rgba(255, 255, 255, 0.5);
 }
 
 .main-actions {
@@ -1409,8 +1089,8 @@ body {
   padding: 0;
 }
 
-#layers-manager, 
-#styles-manager, 
+#layers-manager,
+#styles-manager,
 #traits-manager {
   height: 100%;
   width: 100%;
@@ -1652,7 +1332,8 @@ body {
   color: white !important;
 }
 
-.gjs-four-color, .gjs-four-color-h:hover {
+.gjs-four-color,
+.gjs-four-color-h:hover {
   color: #28a745 !important;
 }
 
@@ -1916,4 +1597,4 @@ body {
   font-size: 0.9rem;
   outline: none;
 }
-</style> 
+</style>

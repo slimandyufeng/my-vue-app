@@ -1,20 +1,18 @@
 <template>
   <div class="home">
     <h1>首页</h1>
-    <p>这是一个使用 Vue 3 + TypeScript + Vite 构建的应用</p>
+    <p>这是一个使用 Vue 3 + Vite 构建的应用</p>
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue'
-
-export default defineComponent({
+<script>
+export default {
   name: 'HomePage',
   components: {},
   setup() {
     return {}
   }
-})
+}
 </script>
 
 <style scoped>
